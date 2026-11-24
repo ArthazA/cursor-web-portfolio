@@ -1,0 +1,17 @@
+{
+  "name": "cursor-web-portfolio",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check"
+  },
+  "dependencies": {
+    "astro": "^5.18.2",
+    "gsap": "^3.15.1",
+    "lenis": "^1.3.28"
+  }
+}

@@ -1,0 +1,109 @@
+---
+import { getCollection, render } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+
+export async function getStaticPaths() {
+  const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+  return projects.map((project, i) => ({
+    params: { slug: project.id },
+    props: { project, next: projects[(i + 1) % projects.length] },
+  }));
+}
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+  next: CollectionEntry<'projects'>;
+}
+
+const { project, next } = Astro.props;
+const { title, summary, kind, role, team, year, stack, repo, link, cover } = project.data;
+const { Content } = await render(project);
+
+const facts = [
+  { k: 'Role', v: role },
+  { k: 'Team', v: team === 'Solo' ? 'Solo' : `${team} people` },
+  { k: 'Type', v: kind },
+  { k: 'Year', v: year },
+];
+---
+
+<Base title={title} description={summary}>
+  <article class="container page-top page-bottom">
+    <a class="arrow-link back" href="/projects" data-reveal="fade"><span aria-hidden="true">←</span> All projects</a>
+
+    <header class="project-head" data-reveal="drag">
+      <p class="section-label">project</p>
+      <h1 class="section-title">{title}</h1>
+      <p class="section-intro">{summary}</p>
+      <ul class="pills stack">{stack.map((s) => <li class="pill">{s}</li>)}</ul>
+    </header>
+
+    <div class="facts panel" data-reveal="fade">
+      {
+        facts.map((f) => (
+          <div>
+            <p class="fact-k mono">{f.k}</p>
+            <p class="fact-v">{f.v}</p>
+          </div>
+        ))
+      }
+      <div class="fact-links">
+        {repo && <a class="btn btn-ghost" href={repo} target="_blank" rel="noopener">View code ↗</a>}
+        {link && <a class="btn btn-primary" href={link} target="_blank" rel="noopener">Try it ↗</a>}
+      </div>
+    </div>
+
+    <div class="cover big" data-reveal="fade">
+      {cover ? <img src={cover} alt={`${title} screenshot`} /> : <span class="cover-mark">{title.slice(0, 2)}</span>}
+    </div>
+
+    <div class="prose body" data-reveal="fade">
+      <Content />
+    </div>
+
+    <a class="next panel" href={`/projects/${next.id}`} data-reveal="fade">
+      <span class="section-label">next project</span>
+      <span class="next-title">{next.data.title} <span class="arrow" aria-hidden="true">→</span></span>
+    </a>
+  </article>
+</Base>
+
+<style>
+  .back { margin-bottom: 40px; }
+  .project-head { max-width: 760px; }
+  .stack { margin-top: 22px; }
+  .facts {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(2, 1fr);
+    margin-top: 40px;
+  }
+  @media (min-width: 860px) {
+    .facts { grid-template-columns: repeat(4, 1fr) auto; align-items: center; }
+  }
+  .fact-k { font-size: 12px; color: var(--muted); }
+  .fact-v { margin-top: 4px; font-weight: 500; }
+  .fact-links { display: flex; flex-wrap: wrap; gap: 10px; grid-column: 1 / -1; }
+  @media (min-width: 860px) { .fact-links { grid-column: auto; } }
+  .cover.big {
+    margin-top: 28px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    aspect-ratio: 21 / 9;
+  }
+  .cover.big .cover-mark { font-size: 120px; }
+  .body { margin-top: 24px; }
+  .next {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 80px;
+    text-decoration: none;
+    transition: border-color 0.3s, transform 0.3s var(--ease);
+  }
+  .next:hover { border-color: var(--line-2); transform: translateY(-3px); }
+  .next-title { font-family: var(--font-display); font-size: 40px; }
+  .next .arrow { display: inline-block; transition: transform 0.3s var(--ease); }
+  .next:hover .arrow { transform: translateX(6px); }
+</style>

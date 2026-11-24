@@ -1,0 +1,15 @@
+---
+import { site, links } from '../data/site';
+const year = new Date().getFullYear();
+---
+
+<footer class="footer">
+  <div class="container footer-inner">
+    <p>© {year} {site.fullName}. Built with Astro.</p>
+    <div class="footer-links">
+      {links.map((l) => <a href={l.href} target="_blank" rel="noopener">{l.label}</a>)}
+      <a href={`mailto:${site.email}`}>Email</a>
+      <!-- Hidden utilities entry goes here later, e.g. a tiny glyph linking to /tools -->
+    </div>
+  </div>
+</footer>

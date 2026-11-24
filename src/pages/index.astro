@@ -1,0 +1,194 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import ExperienceItem from '../components/ExperienceItem.astro';
+import ViewAll from '../components/ViewAll.astro';
+import { site, now, skills } from '../data/site';
+
+const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+const featured = projects.filter((p) => p.data.featured).slice(0, 4);
+const experiences = (await getCollection('experiences'))
+  .sort((a, b) => a.data.order - b.data.order)
+  .slice(0, 2);
+const topSkills = skills.flatMap((g) => g.items).slice(0, 12);
+---
+
+<Base>
+  <!-- Hero -->
+  <section class="hero container">
+    <div class="hero-text" data-reveal="fade">
+      <p class="section-label">hello, i'm</p>
+      <h1 class="hero-title">{site.name}</h1>
+      <p class="hero-role">{site.title}</p>
+      <p class="hero-lede">{site.tagline}</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="/projects">Explore projects</a>
+        <a class="btn btn-ghost" href="/contact">Get in touch</a>
+      </div>
+    </div>
+
+    <aside class="now-card" data-reveal="drag" aria-label="What I'm up to">
+      <div class="now-bar">
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        <span class="now-path mono">~/arthaz — status</span>
+      </div>
+      <ul class="now-list mono">
+        {
+          now.map((n) => (
+            <li>
+              <span class:list={['state', n.state]} aria-hidden="true" />
+              <span class="key">{n.key}</span>
+              <span class="value">{n.value}</span>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="now-foot mono">based in {site.location}</p>
+    </aside>
+  </section>
+
+  <!-- 01 Projects -->
+  <section class="section container">
+    <SectionHeader
+      index="01"
+      label="projects"
+      title="Things I've <em>built</em>"
+      intro="A few projects I'm proud of, from IoT pipelines to multiplayer AR. Each one has a page on how the system works."
+    />
+    <div class="card-grid">
+      {featured.map((p, i) => <ProjectCard project={p} reveal={i === 0 ? 'drag' : 'fade'} delay={i * 0.08} />)}
+    </div>
+    <ViewAll href="/projects" label="View all projects" />
+  </section>
+
+  <!-- 02 Experiences -->
+  <section class="section container">
+    <SectionHeader
+      index="02"
+      label="experiences"
+      title="Where I've <em>been</em>"
+      intro="Programs, teams and places that shaped how I work."
+    />
+    <div class="xp-list">
+      {experiences.map((e, i) => <ExperienceItem item={e} reveal={i === 0 ? 'drag' : 'fade'} />)}
+    </div>
+    <ViewAll href="/experiences" label="View all experiences" />
+  </section>
+
+  <!-- 03 About -->
+  <section class="section container">
+    <SectionHeader index="03" label="about" title="How I <em>think</em>" />
+    <div class="about-teaser panel" data-reveal="drag">
+      <p class="about-lede">
+        <!-- DRAFT: write this in your own voice -->
+        I started out building app screens, but the part that kept pulling me in was everything underneath: how data
+        moves, where it lives, and what happens when one piece fails. Now I'm moving into DevOps to work on that layer
+        on purpose.
+      </p>
+      <ul class="pills about-pills" aria-label="Some of my tools">
+        {topSkills.map((s) => <li class="chip">{s}</li>)}
+      </ul>
+    </div>
+    <ViewAll href="/about" label="More about me" />
+  </section>
+
+  <!-- 04 Contact -->
+  <section class="section container">
+    <div class="cta panel" data-reveal="drag">
+      <p class="section-label">04 / contact</p>
+      <h2 class="section-title">Let's talk <em>systems</em>.</h2>
+      <p class="section-intro">
+        <!-- DRAFT -->
+        Open to DevOps, platform and software engineering roles. Happy to chat about anything I've built here.
+      </p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="/contact">Get in touch</a>
+        <a class="btn btn-ghost" href="https://github.com/ArthazA" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .hero {
+    display: grid;
+    gap: 48px;
+    align-items: center;
+    padding-top: clamp(64px, 11vw, 128px);
+  }
+  @media (min-width: 900px) {
+    .hero { grid-template-columns: 1.25fr 1fr; }
+  }
+  .hero-title {
+    font-family: var(--font-display);
+    font-size: clamp(72px, 13vw, 140px);
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+  }
+  .hero-role {
+    margin-top: 14px;
+    font: 500 clamp(15px, 2vw, 18px) / 1.4 var(--font-mono);
+    color: var(--accent-strong);
+  }
+  .hero-lede {
+    margin-top: 20px;
+    max-width: 30ch;
+    font-size: clamp(19px, 2.4vw, 23px);
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 32px;
+  }
+
+  .now-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+  .now-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+  }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--line-2); }
+  .now-path { margin-left: 10px; font-size: 12px; color: var(--muted); }
+  .now-list {
+    display: grid;
+    gap: 14px;
+    margin: 0;
+    padding: 22px 20px 6px;
+    list-style: none;
+    font-size: 13.5px;
+  }
+  .now-list li {
+    display: grid;
+    grid-template-columns: 12px 78px 1fr;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .state { width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid var(--accent); transform: translateY(-1px); }
+  .state.on { background: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
+  .key { color: var(--muted); }
+  .value { color: var(--ink); }
+  .now-foot { padding: 14px 20px 20px; font-size: 12px; color: var(--muted); }
+
+  .about-lede {
+    max-width: 62ch;
+    font-size: clamp(18px, 2.2vw, 21px);
+    line-height: 1.6;
+    color: var(--ink-2);
+  }
+  .about-pills { margin-top: 26px; gap: 8px; }
+
+  .cta { text-align: left; }
+  .cta .section-intro { max-width: 56ch; }
+</style>

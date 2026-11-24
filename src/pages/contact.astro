@@ -1,0 +1,98 @@
+---
+import Base from '../layouts/Base.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import { site, links } from '../data/site';
+---
+
+<Base title="Contact" description="Get in touch with Arthaz.">
+  <section class="container page-top page-bottom">
+    <SectionHeader
+      level="h1"
+      label="contact"
+      title="Say <em>hello</em>."
+      intro="DRAFT: Whether it's a role, a project, or a question about something I built, my inbox is open."
+    />
+
+    <div class="email panel" data-reveal="drag">
+      <p class="section-label">email</p>
+      <div class="email-row">
+        <a class="email-addr" href={`mailto:${site.email}`}>{site.email}</a>
+        <button class="btn btn-ghost copy" type="button" data-copy={site.email}>
+          <span class="copy-label">Copy</span>
+        </button>
+      </div>
+    </div>
+
+    <ul class="socials">
+      {
+        links.map((l, i) => (
+          <li data-reveal="fade" data-delay={i * 0.06}>
+            <a class="social panel" href={l.href} target="_blank" rel="noopener">
+              <span>
+                <span class="social-label">{l.label}</span>
+                <span class="social-handle mono">{l.handle}</span>
+              </span>
+              <span class="arrow" aria-hidden="true">↗</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+</Base>
+
+<style>
+  .email-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .email-addr {
+    font-family: var(--font-display);
+    font-size: clamp(28px, 5.5vw, 52px);
+    text-decoration: none;
+    overflow-wrap: anywhere;
+  }
+  .email-addr:hover { color: var(--accent-strong); }
+
+  .socials {
+    display: grid;
+    gap: 14px;
+    margin: 18px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  @media (min-width: 760px) {
+    .socials { grid-template-columns: repeat(3, 1fr); }
+  }
+  .social {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    text-decoration: none;
+    transition: border-color 0.3s, transform 0.3s var(--ease);
+  }
+  .social:hover { border-color: var(--line-2); transform: translateY(-3px); }
+  .social-label { display: block; font-weight: 600; }
+  .social-handle { display: block; margin-top: 2px; font-size: 13px; color: var(--muted); }
+  .social .arrow { font-size: 20px; color: var(--accent); transition: transform 0.3s var(--ease); }
+  .social:hover .arrow { transform: translate(3px, -3px); }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('[data-copy]').forEach((btn) => {
+    const label = btn.querySelector('.copy-label')!;
+    btn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(btn.dataset.copy ?? '');
+        label.textContent = 'Copied ✓';
+      } catch {
+        label.textContent = 'Press ⌘C';
+      }
+      setTimeout(() => (label.textContent = 'Copy'), 1800);
+    });
+  });
+</script>

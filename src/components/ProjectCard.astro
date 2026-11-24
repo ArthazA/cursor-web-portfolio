@@ -1,0 +1,45 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+  reveal?: 'drag' | 'fade';
+  delay?: number;
+  maxPills?: number;
+}
+
+const { project, reveal = 'fade', delay = 0, maxPills = 4 } = Astro.props;
+const { title, summary, role, team, year, stack, cover } = project.data;
+const shown = stack.slice(0, maxPills);
+const extra = stack.length - shown.length;
+const teamLabel = team === 'Solo' ? 'Solo' : `Team of ${team}`;
+const yearLabel = year.startsWith('TODO') ? '' : year;
+---
+
+<div
+  class="card-wrap"
+  data-reveal={reveal}
+  data-delay={delay}
+  data-stack={stack.join('|')}
+>
+  <a class="card" href={`/projects/${project.id}`} data-tilt>
+    <div class="cover">
+      {
+        cover ? (
+          <img src={cover} alt="" loading="lazy" />
+        ) : (
+          <span class="cover-mark" aria-hidden="true">{title.slice(0, 2)}</span>
+        )
+      }
+    </div>
+    <div class="card-body">
+      <p class="card-meta">{[yearLabel, role, teamLabel].filter(Boolean).join(' · ')}</p>
+      <h3 class="card-title">{title}</h3>
+      <p class="card-summary">{summary}</p>
+      <ul class="pills" aria-label="Tech stack">
+        {shown.map((s) => <li class="pill">{s}</li>)}
+        {extra > 0 && <li class="pill more">+{extra}</li>}
+      </ul>
+    </div>
+  </a>
+</div>

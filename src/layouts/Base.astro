@@ -1,0 +1,74 @@
+---
+import '../styles/global.css';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import GhostCursor from '../components/GhostCursor.astro';
+import { site } from '../data/site';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title, description = site.description } = Astro.props;
+const pageTitle = title ? `${title} · ${site.name}` : `${site.name} · ${site.title}`;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="theme-color" content="#f4f7f1" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <!-- TODO: add a 1200×630 preview image at /public/og.png, then uncomment -->
+    <!-- <meta property="og:image" content={new URL('/og.png', Astro.site)} /> -->
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <script is:inline>
+      // Hide reveal targets until the animation script takes over.
+      // Safety net: if the script never loads, show everything after 3s.
+      document.documentElement.classList.add('js');
+      setTimeout(function () {
+        if (!document.documentElement.classList.contains('motion-ready')) {
+          document.documentElement.classList.remove('js');
+        }
+      }, 3000);
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <div class="bg" aria-hidden="true">
+      <div class="bg-grid" data-parallax-grid="0.12"></div>
+      <div class="bg-blob b1" data-parallax="0.05"></div>
+      <div class="bg-blob b2" data-parallax="0.09"></div>
+    </div>
+
+    <Nav />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+    <GhostCursor />
+
+    <script>
+      import '../scripts/motion';
+    </script>
+  </body>
+</html>

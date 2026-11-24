@@ -1,0 +1,42 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { getEntry } from 'astro:content';
+
+interface Props {
+  item: CollectionEntry<'experiences'>;
+  reveal?: 'drag' | 'fade';
+  delay?: number;
+  showRelated?: boolean;
+}
+
+const { item, reveal = 'fade', delay = 0, showRelated = false } = Astro.props;
+const { role, org, period, type, summary, related } = item.data;
+
+const relatedProjects = showRelated
+  ? (await Promise.all(related.map((id) => getEntry('projects', id)))).filter(Boolean)
+  : [];
+---
+
+<article class="panel xp" data-reveal={reveal} data-delay={delay}>
+  <div>
+    <p class="xp-period">{period}</p>
+    <span class="xp-type">{type}</span>
+  </div>
+  <div>
+    <h3 class="xp-role">{role}</h3>
+    <p class="xp-org">{org}</p>
+    <p class="xp-summary">{summary}</p>
+    <div class="prose"><slot /></div>
+    {
+      relatedProjects.length > 0 && (
+        <div class="xp-related">
+          {relatedProjects.map((p) => (
+            <a class="arrow-link" href={`/projects/${p!.id}`}>
+              {p!.data.title} <span class="arrow" aria-hidden="true">→</span>
+            </a>
+          ))}
+        </div>
+      )
+    }
+  </div>
+</article>

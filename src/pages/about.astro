@@ -1,0 +1,143 @@
+---
+import Base from '../layouts/Base.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import { site, skills } from '../data/site';
+---
+
+<Base title="About" description="About Arthaz, plus the skills and technologies he works with.">
+  <section class="container page-top">
+    <SectionHeader level="h1" label="about" title="Hi, I'm <em>Arthaz</em>." reveal="drag" />
+
+    <div class="intro">
+      <div class="photo" data-reveal="fade" aria-hidden="true">
+        <!-- TODO: replace with <img src="/me.jpg" alt="Arthaz" /> (put the photo in /public) -->
+        <span class="cover-mark">A</span>
+      </div>
+      <div class="prose" data-reveal="fade">
+        <!-- DRAFT: everything below is a placeholder. Rewrite it in your own voice. -->
+        <p>
+          I'm a software engineer based in {site.location}. Most of my projects so far have been mobile apps (iOS
+          with SwiftUI, plus React Native and Flutter), usually built in small teams where my role shifted depending on
+          what the project needed.
+        </p>
+        <p>
+          Somewhere along the way I noticed the part I enjoyed most wasn't the screen, it was the system behind it.
+          On Turterra I moved from frontend into IoT and backend work: getting sensor readings into a database
+          safely, designing the schema, and figuring out who should be allowed to see what.
+        </p>
+        <p>
+          That's why I'm moving into <strong>DevOps</strong>. I want to understand, and be responsible for, how
+          software is built, shipped, run and kept healthy.
+        </p>
+        <p>TODO: something personal. What do you do when you're not coding?</p>
+        {
+          site.cv && (
+            <p>
+              <a class="btn btn-primary" href={site.cv} download>Download CV</a>
+            </p>
+          )
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="container section">
+    <SectionHeader
+      index="01"
+      label="principles"
+      title="How I <em>work</em>"
+      intro="DRAFT: three short beliefs about building software. Replace these with yours."
+    />
+    <div class="principles">
+      <div class="panel" data-reveal="drag">
+        <p class="mono num">01</p>
+        <h3>Understand it before changing it</h3>
+        <p>TODO: a sentence or two.</p>
+      </div>
+      <div class="panel" data-reveal="fade" data-delay="0.08">
+        <p class="mono num">02</p>
+        <h3>Make the boring parts reliable</h3>
+        <p>TODO</p>
+      </div>
+      <div class="panel" data-reveal="fade" data-delay="0.16">
+        <p class="mono num">03</p>
+        <h3>Leave it easier for the next person</h3>
+        <p>TODO</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="container section page-bottom">
+    <SectionHeader
+      index="02"
+      label="skills"
+      title="Skills &amp; <em>technologies</em>"
+      intro="Gathered from the projects I've worked on."
+    />
+    <div class="skills">
+      {
+        skills.map((g, i) => (
+          <div class="panel skill-group" data-reveal={i === 0 ? 'drag' : 'fade'} data-delay={(i % 3) * 0.06}>
+            <div class="skill-head">
+              <h3>{g.group}</h3>
+              {g.note && <span class="xp-type">{g.note}</span>}
+            </div>
+            <ul class="pills">
+              {g.items.map((s) => (
+                <li class="chip">{s}</li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+</Base>
+
+<style>
+  .intro {
+    display: grid;
+    gap: 40px;
+    align-items: start;
+  }
+  @media (min-width: 860px) {
+    .intro { grid-template-columns: 300px 1fr; gap: 56px; }
+  }
+  .photo {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 4 / 5;
+    max-width: 300px;
+    border-radius: var(--radius);
+    border: 1px solid var(--line);
+    background: linear-gradient(160deg, var(--accent-soft), #f6f9f4);
+  }
+  .photo .cover-mark { font-size: 96px; }
+
+  .principles, .skills {
+    display: grid;
+    gap: 18px;
+  }
+  @media (min-width: 760px) {
+    .principles { grid-template-columns: repeat(3, 1fr); }
+    .skills { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (min-width: 1040px) {
+    .skills { grid-template-columns: repeat(3, 1fr); }
+  }
+  .principles h3, .skill-group h3 {
+    font-family: var(--font-display);
+    font-size: 26px;
+  }
+  .principles .num { font-size: 12px; color: var(--accent-strong); margin-bottom: 12px; }
+  .principles p:last-child { margin-top: 10px; color: var(--ink-2); }
+  .skill-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .skill-head .xp-type { margin-top: 0; }
+  .skill-group .pills { gap: 8px; }
+</style>

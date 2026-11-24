@@ -1,0 +1,76 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import SectionHeader from '../../components/SectionHeader.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+
+const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+
+// Tech filter: count how many projects use each technology
+const counts = new Map<string, number>();
+projects.forEach((p) => p.data.stack.forEach((s) => counts.set(s, (counts.get(s) ?? 0) + 1)));
+const techs = [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).map(([t]) => t);
+---
+
+<Base title="Projects" description="Projects by Arthaz: iOS apps, IoT pipelines, AR games and cross-platform mobile apps.">
+  <section class="container page-top page-bottom">
+    <SectionHeader
+      level="h1"
+      label="projects"
+      title="Everything I've <em>built</em>"
+      intro="Team projects and solo experiments. Open any of them to see my role, the stack, and how the system fits together."
+      reveal="drag"
+    />
+
+    <div class="filter" data-reveal="fade" role="group" aria-label="Filter by tech">
+      <button class="filter-btn active" data-tech="" aria-pressed="true">All</button>
+      {techs.map((t) => <button class="filter-btn" data-tech={t} aria-pressed="false">{t}</button>)}
+    </div>
+
+    <div class="card-grid three" id="project-grid">
+      {projects.map((p, i) => <ProjectCard project={p} reveal="fade" delay={(i % 3) * 0.08} />)}
+    </div>
+  </section>
+</Base>
+
+<style>
+  .filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 32px;
+  }
+  .filter-btn {
+    padding: 7px 13px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--ink-2);
+    font: 500 12.5px/1 var(--font-mono);
+    cursor: pointer;
+    transition: background-color 0.25s, color 0.25s, border-color 0.25s;
+  }
+  .filter-btn:hover { border-color: var(--line-2); color: var(--ink); }
+  .filter-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+</style>
+
+<script>
+  const grid = document.getElementById('project-grid')!;
+  const buttons = document.querySelectorAll<HTMLButtonElement>('.filter-btn');
+  const cards = grid.querySelectorAll<HTMLElement>('.card-wrap');
+
+  buttons.forEach((btn) =>
+    btn.addEventListener('click', () => {
+      const tech = btn.dataset.tech ?? '';
+      grid.classList.add('is-filtering'); // skip reveal animations once the visitor filters
+      buttons.forEach((b) => {
+        const on = b === btn;
+        b.classList.toggle('active', on);
+        b.setAttribute('aria-pressed', String(on));
+      });
+      cards.forEach((c) => {
+        c.hidden = tech !== '' && !(c.dataset.stack ?? '').split('|').includes(tech);
+      });
+    }),
+  );
+</script>

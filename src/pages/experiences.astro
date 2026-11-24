@@ -1,0 +1,33 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import ExperienceItem from '../components/ExperienceItem.astro';
+
+const items = await Promise.all(
+  (await getCollection('experiences'))
+    .sort((a, b) => a.data.order - b.data.order)
+    .map(async (item) => ({ item, Content: (await render(item)).Content })),
+);
+---
+
+<Base title="Experiences" description="Programs, roles and education that shaped how Arthaz works.">
+  <section class="container page-top page-bottom">
+    <SectionHeader
+      level="h1"
+      label="experiences"
+      title="Where I've <em>been</em>"
+      intro="The programs, teams and studies behind the projects. Most recent first."
+      reveal="drag"
+    />
+    <div class="xp-list">
+      {
+        items.map(({ item, Content }, i) => (
+          <ExperienceItem item={item} showRelated reveal="fade" delay={i * 0.05}>
+            <Content />
+          </ExperienceItem>
+        ))
+      }
+    </div>
+  </section>
+</Base>

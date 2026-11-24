@@ -1,0 +1,18 @@
+---
+interface Props {
+  index?: string; // "01"
+  label: string; // "projects"
+  title: string; // may contain <em>…</em> for the green italic accent
+  intro?: string;
+  level?: 'h1' | 'h2';
+  reveal?: 'drag' | 'fade';
+}
+const { index, label, title, intro, level = 'h2', reveal = 'fade' } = Astro.props;
+const Heading = level;
+---
+
+<header class="section-header" data-reveal={reveal}>
+  <p class="section-label">{index ? `${index} / ${label}` : label}</p>
+  <Heading class="section-title" set:html={title} />
+  {intro && <p class="section-intro">{intro}</p>}
+</header>
